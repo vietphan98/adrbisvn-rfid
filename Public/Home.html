@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="dhtmlx/codebase/dhtmlx.js" type="text/javascript"></script> 
+    <link rel="STYLESHEET" type="text/css" href="dhtmlx//skins/dhtmlx/dhtmlx.css">   
+    <link rel="icon" href="images/Logo.ico">
+    <title>AD@Rfid-HomePage</title>
+</head>
+        <style>
+            html, body {
+                                            width: 100%;
+                                            height: 100%;
+                                            padding: 0;
+                                            margin: 0;
+                                            font-family: \"Source Sans Pro\",\"Helvetica Neue\",Helvetica;
+                                            background-repeat: no-repeat;
+                                            background-size: 100%;
+                                        }
+                                    
+        </style>
+        <script>
+            function DocumentStart(){
+                var ToolbarMain,LayoutMain, FormMain, FormMainSub, LayoutLot, LayoutLotQty, GridLot, GridLotQty, GridLotQty2nd, GridMaterialSub, DATA_ORDER, DATA_RAW, ITEM_DETAIL, ITEM_MATERIAL,DESCRIPTION;
+
+                LayoutMain = new dhtmlXLayoutObject({
+                    parent: document.body,
+                    pattern: "5G",
+                    offsets: {
+                        top: 0
+                    },
+                    cells: [
+                        {id: "a", header: false, width: 620, height: 140}, 
+                        {id: "b", header: true, text: "Production Order Detail"}, 
+                        {id: "c", header: true, text: "Production Order Detail Sub"}, 
+                        {id: "d", header: true, width: 500, text: "Lot Number"}, 
+                        {id: "e", header: true, text: "Lot Quantity"}
+                    ]
+                });
+                LayoutLot = LayoutMain.cells("d").attachLayout({
+                        pattern: "3E",
+                        cells: [
+                            {id: "a", header: true, text: "Lot Number"}, 
+                            {id: "b", header: true, text: "Material List", height: 200}, 
+                            {id: "c", header: true, text: "Material List SUB", height: 200}, 
+                        ]
+                    });
+
+                    LayoutLotQty = LayoutMain.cells("e").attachLayout({
+                        pattern: "2E",
+                        cells: [
+                            {id: "a", header: true, text: "Lot Quantity"}, 
+                            {id: "b", header: true, text: "Lot Quantity 2nd"}, 
+                        ]
+                    });
+                    LayoutMain.cells("c").collapse();
+                    LayoutLot.cells("c").collapse();
+                    LayoutLotQty.cells("b").collapse();
+
+                    ToolbarMain = LayoutMain.attachToolbar({
+                        icons_path: "/dhtmlx/common/imgs/",
+                        align: "left",
+                    });
+
+                     ToolbarMain.addText("Title", null, "JOBJACKET@RFID");
+                     ToolbarMain.addSeparator("Space", null);
+                     ToolbarMain.addSpacer("Title");
+                    
+                    // document.addEventListener(\'paste\',function (event) {
+                    //     CT = event.clipboardData.types;
+                    //     CopyClipBoard = event.clipboardData.getData(\'Text\');
+                    // });
+                    ToolbarMain.addText("text", null, "SOL: ");
+                    ToolbarMain.addInput("SO", null, "", 100); //51957985-2 ; 52733068-1
+                    ToolbarMain.addText("text", null, "SOL Sample: ");
+                    ToolbarMain.addInput("SOSample", null, "", 100);
+                    // ToolbarMain.addButton("AddQty", null, "Add SL LineSam (F10)", "save.gif");
+                    ToolbarMain.addText("AddQty", null, "Add SL Line Sample: ");
+                    ToolbarMain.addInput("Qty", null, "", 30);
+                    ToolbarMain.addText("text", null, "|| Item: ");
+                    ToolbarMain.addInput("BuildStock", null, "", 100);
+                    ToolbarMain.addButton("GPDSample", null, "GPD Sample", "save.gif");
+                    ToolbarMain.addButton("Buildstock_Sample", null, "Buildstock Sample", "save.gif"); //QUYNH THEM
+                    //ToolbarMain.addSpacer("GPDSample");
+                    ToolbarMain.addText("text", null, "||");
+                    ToolbarMain.addButton("CreatedJob", null, "Create Order (F11)", "save.gif");
+                    ToolbarMain.addButton("CreatedJobPrint", null, "Create & Print (F12)", "save.gif");
+
+                    ToolbarMain.addText("text_from", null, " ||  From :");
+                    ToolbarMain.addInput("date_from", null, "", 75);
+                    ToolbarMain.addText("text_to", null, "To:");
+                    ToolbarMain.addInput("date_to", null, "", 75);
+                    input_from = ToolbarMain.getInput("date_from");
+                    input_to = ToolbarMain.getInput("date_to");
+                    input_from.setAttribute("readOnly", "false");
+                    input_to.setAttribute("readOnly", "false");
+                    input_till = ToolbarMain.getInput("date_from");
+                    input_till1 = ToolbarMain.getInput("date_to");
+                    ToolbarCalendar = new dhtmlXCalendarObject([input_from,input_till]);
+                    ToolbarCalendar1 = new dhtmlXCalendarObject([input_to,input_till1]);
+                    ToolbarCalendar.setDateFormat("%Y-%m-%d");
+                    ToolbarCalendar1.setDateFormat("%Y-%m-%d");
+                    // ToolbarMain.setValue("date_from",Date());
+                    // ToolbarMain.setValue("date_to",Date());
+                    ToolbarMain.addButton("ExportData", null, "Export Data", "save.gif");
+                    ToolbarMain.addButton("UpdateCombo", null, "Update Combo", "save.gif");
+            }
+        </script>
+<body onload="DocumentStart()">
+    
+</body>
+</html>
