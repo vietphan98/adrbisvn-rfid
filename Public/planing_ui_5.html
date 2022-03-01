@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en"><head><title>AD@Rfid-Auto Planning5</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="dhtmlx/codebase/dhtmlx.js" type="text/javascript"></script> 
+    <link rel="STYLESHEET" type="text/css" href="dhtmlx//skins/material/dhtmlx.css"> 
+    <script src="js/jquery-1.10.1.min.js"></script> 
+    <script src="js/Zero.js"></script> 
+      <link rel="icon" href="images/Logo.ico"><style>html,body{width:100%;height:100%;padding:0;margin:0;font-family:"Source Sans Pro","Helvetica Neue",Helvetica;background-repeat:no-repeat;background-size:100%;}</style></head>
+    <script>
+        var LayoutMain,ToolbarMain,GridMain, CopyClipBoard, CT;;
+        document.addEventListener('paste',function (event) {
+                        CT = event.clipboardData.types;
+                        CopyClipBoard = event.clipboardData.getData('Text');
+        });
+        function DocumentStart(){
+            LayoutMain = new dhtmlXLayoutObject({
+                    parent: document.body,
+                    pattern: "4C",
+                    cells: [
+                        {id: "a", header: true,text: "Data Import"}, 
+                        {id: "b", header: true, text: "Machine 01"}, 
+                        {id: "c", header: true, text: "Machine 02"}, 
+                        {id: "d", header: true , text: "Machine 03"}, 
+                    ]
+                });
+
+                ToolbarMain = LayoutMain.attachToolbar({
+                        icons_path: "/dhtmlx/common/imgs/",
+                        align: "left",
+                });
+                ToolbarMain.addText("Title", null, " <a style='font-size:20pt;font-weight:bold'> <img src='./images/Logo.ico'  width='25' height='25'>ADVN@RFID hangtags-UI / Planning M5</a>");
+                ToolbarMain.addButton("ImportData", null, "Import Data Excel", "upload.png");
+                InitGrid();
+        }
+        function InitGrid(){
+            GridMain = LayoutMain.cells("a").attachGrid();
+            GridMain.setHeader(",PO,SOLINE,ORDER_ITEM,ORACLE_ITEM,RBO,QTY,UPS,SKU,PRINTING SIZE,INLAY POSITION,INLAY CODE,NEEDED INLAY QUANTITY,Basesheet code,Needed basesheet quantity,Inlay status,Basesheet status,RM status,Wip status,PO# readiness,Lasted plan time,Adjusted lasted plan time,Service-priority#,Due-date,Quantity (sheet),Quantity already ran (sheet),Quantity need to run (sheet),Service risk,Set-up time,Run time,Total needed time,Estimated finish time,PO# Note,Machine,Position in machine")
+            GridMain.setInitWidths("50,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100");
+            GridMain.setColAlign("left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left,left");
+            GridMain.setColTypes("ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed");
+            GridMain.setColSorting("str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str");
+            GridMain.attachHeader("#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter,#text_filter");
+            GridMain.init();
+            for(let i = 1 ; i < 600; i++){
+                GridMain.addRow(i,[i]);
+            }
+            GridMain.attachEvent("onEditCell", function(stage,rId,cInd,nValue,oValue){
+                    if (stage==1 && this.editor && this.editor.obj){
+                        this.editor.obj.select();
+                        }
+                    return true;
+                });
+            GridMain.attachEvent("onKeyPress", function(code,cFlag,sFlag){
+            var LastRow = this.getRowsNum();
+            if(this.getSelectedBlock() == null) return;
+            var top_row = this.getSelectedBlock().LeftTopRow;
+            var IndexRow = top_row;
+            if(typeof top_row == "string") IndexRow = this.getRowIndex(top_row);
+            var bottom_row = this.getSelectedBlock().RightBottomRow;
+            var left_column = this.getSelectedBlock().LeftTopCol;
+            var right_column = this.getSelectedBlock().RightBottomCol;
+            if(!cFlag && !sFlag && code == 13) { //Enter
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 38) { //Up
+                if(IndexRow - 1 < 0) return;
+                this.selectCell(IndexRow - 1,left_column,false,false,false,true);
+                return false;
+            } else if(!cFlag && !sFlag && code == 40) { //Down
+                if(IndexRow + 1 == LastRow) return;
+                this.selectCell(IndexRow + 1,left_column,false,false,false,true);
+                return false;
+            } else if((!cFlag && !sFlag && code == 39) || (!sFlag && code == 9)) { //Right
+                if(left_column + 1 > this.getColumnsNum()) return;
+                if(this.editor && this.editor.obj.selectionEnd != this.editor.obj.value.length && this.editor.obj.value.length != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column + 1,false,false,false,true);
+                    return false;
+                }
+            } else if((!cFlag && !sFlag && code == 37) || (sFlag && code == 9)) { //Left
+                if(left_column - 1 < 0) return;
+                if(this.editor && this.editor.obj.selectionEnd != 0) return true;
+                else {
+                    this.selectCell(IndexRow,left_column - 1,false,false,false,true);
+                    return false;
+                }
+                return false;
+            } else if(!cFlag && !sFlag && code == 46) { //Del
+                //     if(typeof top_row == "string") {
+                //        // this.cells(top_row,left_column).setValue("");
+                //        var DataTable = {"EVENT":"DELETECOMBO" , "SOLINE" :this.cells(top_row,0).getValue()};
+                //         var Result = AjaxAsync("Event.php",DataTable,"POST","HTML");
+                //         if(Result == "OK") {
+                //             dhtmlx.alert("Đã xóa SOLINE : " + this.cells(top_row,0).getValue());
+
+                //             GridData.clearAll();
+                //                var Result = AjaxAsync("Event.php", {
+                //               "EVENT": "LOADDATACOMBO"
+                //                 });
+                
+                //               GridData.parse(Result);
+
+                //           }else{
+                //                 GridData.clearAll();
+                //                   var Result = AjaxAsync("Event.php", {
+                //                "EVENT": "LOADDATACOMBO"
+                //                 });
+                
+                //               GridData.parse(Result);
+                //               dhtmlx.alert("Đã xảy ra lỗi, vui lòng kiểm tra lại ");
+                //           }
+                //     } 
+                // return true;
+            }else if(!cFlag && sFlag && code == 46) { //Shift + Del
+                    if(typeof top_row == "string") {
+                        this.deleteRow(top_row);
+                    } else {
+                        for(var i = bottom_row; i >= top_row; i--){
+                            this.deleteRow(this.getRowId(i));
+                        }
+                    }
+                return true;
+            }  else if(cFlag && !sFlag && code == 68) { //Ctrl + D
+                for(var i = top_row + 1; i <= bottom_row; i++){
+                    for(var j = left_column; j <= right_column; j++) {
+                        this.cells2(i,j).setValue(this.cells2(top_row,j).getValue());
+                    }
+                }
+            } else if(!this.editor && (!cFlag) && ((code > 64 && code < 91) || (code > 47 && code < 58)) || code == 113 || (code >= 96 && code <= 105)) { // Any Key
+                if(typeof top_row == "string") this.editCell(); 
+                else this.editCell();
+                return false;
+            } else if(cFlag && !sFlag && code == 67) { //Copy
+                var DataCB = [];
+                var DataCB1 = [];
+                if(typeof top_row == "string") {
+                    DataCB = this.cells(top_row,left_column).getValue() + "\n";
+                    copyTextToClipboard(DataCB);
+                    this.SelectCellEditor();
+                } else {
+                    for(var i = top_row; i <= bottom_row; i++){
+                        for(var j = left_column; j <= right_column; j++) {
+                            DataCB1.push(this.cells2(i,j).getValue().replace("\n",""));
+                        }
+                        if(DataCB1 != "") DataCB.push(DataCB1.join("\t"));
+                        DataCB1 = [];
+                    }
+                    copyTextToClipboard(DataCB.join("\r\n"));
+                }
+                return true;
+            } else if(cFlag && !sFlag && code == 86) { //Paste
+                if(!this.editor) this.AddClipBoard();
+                return true;
+            }
+            return true;
+        });
+
+        }
+    </script>
+<body onload="DocumentStart()"></body></html>
