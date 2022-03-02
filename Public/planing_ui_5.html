@@ -9,12 +9,19 @@
     <script src="js/Zero.js"></script> 
       <link rel="icon" href="images/Logo.ico"><style>html,body{width:100%;height:100%;padding:0;margin:0;font-family:"Source Sans Pro","Helvetica Neue",Helvetica;background-repeat:no-repeat;background-size:100%;}</style></head>
     <script>
-        var LayoutMain,ToolbarMain,GridMain, CopyClipBoard, CT;;
+        var LayoutMain,ToolbarMain,GridMain, CopyClipBoard, CT;
+        var URI = 'http://localhost:8080/api/v1/planning_ui'
         document.addEventListener('paste',function (event) {
                         CT = event.clipboardData.types;
                         CopyClipBoard = event.clipboardData.getData('Text');
         });
         function DocumentStart(){
+           
+                InitLayout()
+                InitToolbar();
+                InitGrid();
+        }
+        function InitLayout(){
             LayoutMain = new dhtmlXLayoutObject({
                     parent: document.body,
                     pattern: "4C",
@@ -25,14 +32,47 @@
                         {id: "d", header: true , text: "Machine 03"}, 
                     ]
                 });
-
-                ToolbarMain = LayoutMain.attachToolbar({
+        }
+        function InitToolbar(){
+            ToolbarMain = LayoutMain.attachToolbar({
                         icons_path: "/dhtmlx/common/imgs/",
                         align: "left",
                 });
                 ToolbarMain.addText("Title", null, " <a style='font-size:20pt;font-weight:bold'> <img src='./images/Logo.ico'  width='25' height='25'>ADVN@RFID hangtags-UI / Planning M5</a>");
                 ToolbarMain.addButton("ImportData", null, "Import Data Excel", "upload.png");
-                InitGrid();
+                ToolbarMain.addButton("SaveData",null,"Save Data","save_as.gif")
+                ToolbarMain.attachEvent("onClick",function(name){
+                    if(name == "SaveData"){
+                        var DataSend = [] ;
+                        var Column = "po,so_line,order_item,oracle_item,rbo,qty,ups,sku,printing_size,inlay_position,inlay_code,needed_inlay_quantity,basesheet_code,needed_basesheet_quantity,inlay_status,basesheet_status,rm_status,wip_status,po_readiness,lasted_plan_time,adjusted_lasted_plan_time,service_priority,due_date,quantity_sheet,quantity_already_ran_sheet,quantity_need_to_run_sheet,service_risk,setup_time,run_time,total_needed_time,estimated_finish_time,po_note,machine,position_in_machine";
+                        for(var i = 0 ; i < GridMain.getRowsNum();i++){
+                            if(GridMain.cells2(i,1).getValue() != ""){
+                                var ArrAdd = [];
+                                for(var j = 1 ; j < GridMain.getColumnsNum();j++){
+                                    ArrAdd.push(GridMain.cells2(i,j).getValue().replace("'","''"));
+                                }
+                                DataSend.push(ArrAdd);
+
+                            }
+                        }
+                        console.log(DataSend)
+                        dhtmlx.confirm({
+                            type: "confirm-warning",
+                            text : "Do you want to store data?",
+                            callback: function(){
+                                var DataTable = {"EVENT" : "SAVEDATA"};
+                                DataTable.DATA = JSON.stringify(DataSend);
+                                DataTable.COLUMN = Column ;
+                                var Result = AjaxAsync(`${URI}/SaveData`,DataTable,"POST","JSON");
+                                if(Result === "OK"){
+                                    dhtmlx.alert("Successfully added data");
+                                }else{
+                                    dhtmlx.alert("An error occurred during the process");
+                                }
+                            }
+                        })
+                    }
+                })
         }
         function InitGrid(){
             GridMain = LayoutMain.cells("a").attachGrid();
@@ -88,7 +128,8 @@
                     return false;
                 }
                 return false;
-            } else if(!cFlag && !sFlag && code == 46) { //Del
+            }
+             else if(!cFlag && !sFlag && code == 46) { //Del
                 //     if(typeof top_row == "string") {
                 //        // this.cells(top_row,left_column).setValue("");
                 //        var DataTable = {"EVENT":"DELETECOMBO" , "SOLINE" :this.cells(top_row,0).getValue()};
